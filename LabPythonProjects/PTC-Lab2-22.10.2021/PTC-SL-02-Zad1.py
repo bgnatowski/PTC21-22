@@ -5,12 +5,8 @@ MIN_PODSTAWA = 2
 MAX_PODSTAWA = 36
 #####################
 
-# testy dla 0 zeby dzialy
 
-# dziala aktualnie: CHYBA DZIALA
-# z wiekszej (do 10) na mniejszą
-# z wiekszej (od 10) na mniejsza
-def wczytajPodstaweWejsciowa():
+def getInputBase():
     podstawa = int(input('Podaj podstawę liczby do przeliczenia (2-36): '))
     while podstawa < MIN_PODSTAWA or podstawa > MAX_PODSTAWA:
         print('Błedna podstawa!')
@@ -18,14 +14,15 @@ def wczytajPodstaweWejsciowa():
     return podstawa
 
 
-# sprawdza czy podana liczba w systemie > 10 używa odpowienich dla siebie liter sys(11) do A, sys(12) do B
-# sys(13) do C, sys(14) do D .... sys(36) do Z
+# TODO
 def isCorrectForBase(liczba, podstawa):
+    # sprawdza czy podana liczba w systemie > 10 używa odpowienich dla siebie liter sys(11) do A, sys(12) do B
+    # sys(13) do C, sys(14) do D .... sys(36) do Z
     # narazie zwracam true jako iż zakladam ze wprowadzona liczba nie bedzie zawierać niepoprawnych znakow
     return True
 
 
-def wczytajLiczbeOPodstawie(podstawa):
+def getNumberInBase(podstawa):
     while True:
         if podstawa <= MIN_PODSTAWA_BEZ_ZNAKOW_ALFABETU:
             liczba = input(f'Podaj liczbe w systemie ({podstawa}):')
@@ -36,18 +33,20 @@ def wczytajLiczbeOPodstawie(podstawa):
                 return liczba
 
 
-def wczytajPodstaweWynikowa(podstawaWej):
+def getOutputBase(podstawaWej):
     podstawa = int(input(f'Podaj podstawę liczby wynikowej: (2-36) bez ({podstawaWej}): '))
-    while podstawa < MIN_PODSTAWA or podstawa > MAX_PODSTAWA or podstawa == podstawaWej:
+
+    while (MIN_PODSTAWA > podstawa < MAX_PODSTAWA) or (podstawa == podstawaWej):
         print('Błedna podstawa!')
         if podstawa == podstawaWej:
-            print(f'Po co przeliczać liczbę o podstawie ({podstawaWej}) na te samą?')
+            print(f'Po co przeliczać liczbę o podstawie ({podstawaWej}) na tą samą?')
+
         podstawa = int(input(f'Podaj podstawę liczby wynikowej (2-36) bez ({podstawaWej}): '))
 
     return podstawa
 
-#dziala przez podstaawe 10
-def zmienModulo(liczba, podstawaWyj):
+
+def dec2other(liczba, podstawaWyj):
     liczba = int(liczba)
     reszty = []
     while liczba != 0:
@@ -62,55 +61,62 @@ def zmienModulo(liczba, podstawaWyj):
     return "".join(reszty)
 
 
-def znakNaLiczbe(znak):
+def getValue(znak):
     if znak.isdigit():
-        wartoscLiczby = int(znak)
+        value = int(znak)
     elif 'a' <= znak.lower() <= 'z':
-        wartoscLiczby = ord(znak.lower()) - ord('a') + 10
-    return wartoscLiczby
+        value = ord(znak.lower()) - ord('a') + 10
+    return value
 
 
-def konwertujLiczbeNaZnaki(liczba):
-    znaki = []
+def getValuesOf(liczba):
+    values = []
     dlugoscLiczby = len(liczba)
 
     for i in range(dlugoscLiczby):
-        znaki.append(znakNaLiczbe(liczba[i]))
-    return znaki
+        charValue = getValue(liczba[i])
+        values.append(charValue)
+    return values
 
 
-def konwertujNaWartosc(liczba, podstawaWej):
-    znakiWLiczbie = konwertujLiczbeNaZnaki(liczba)
+def other2dec(liczba, podstawaWej):
+    wartosciZnakowLiczby = getValuesOf(liczba)
     dlugoscLiczby = len(liczba)
+    liczbaW10 = 0
 
-    suma = 0
+    # liczaW10 = a_0 * p^n + a_1 * p^n-1 + a_m * p^m
     for i in range(dlugoscLiczby):
         dlugoscLiczby -= 1
-        wartosc = znakiWLiczbie[i] * (podstawaWej ** dlugoscLiczby)
-        suma += wartosc
-        print(f'{i}. znak to {liczba[i].upper()} ({znakiWLiczbie[i]}*{podstawaWej}^{dlugoscLiczby})')
-    print(f'Suma = {suma}')
-    return suma
+        znak = liczba[i].upper()
+        wartoscZnaku = wartosciZnakowLiczby[i]
+        liczbaW10 += wartoscZnaku * (podstawaWej ** dlugoscLiczby)
+        print(f'{i}. znak to {znak} ({wartoscZnaku}*{podstawaWej}^{dlugoscLiczby})')
+
+    print(f'Liczba {liczba}({podstawaWej}) w sys 10 = {liczbaW10}')
+    print('Teraz nastąpi przeliczenie na liczbe na zadaną podstawie wyjściowa:')
+    return liczbaW10
 
 
 def main():
     while True:
         print('***Program do przeliczania liczby pomiędzy dwoma systemami liczbowymi***\n')
 
-        podstawaWej = wczytajPodstaweWejsciowa()
-        liczba = wczytajLiczbeOPodstawie(podstawaWej)
-        podstawaWyj = wczytajPodstaweWynikowa(podstawaWej)
+        inputBase = getInputBase()
+        inputNumber = getNumberInBase(inputBase)
+        outputBase = getOutputBase(inputBase)
 
-        suma = konwertujNaWartosc(liczba, podstawaWej)
-        if suma == 0:
-            liczbaWynikowa = 0
+        numberIn10 = other2dec(inputNumber, inputBase)
+
+        # wyłapanie liczby 0
+        if numberIn10 == 0:
+            outputNumber = '0'
         else:
-            liczbaWynikowa = zmienModulo(suma, podstawaWyj)
+            outputNumber = dec2other(numberIn10, outputBase)
 
-        print(f'Liczba {liczba}({podstawaWej}) = {liczbaWynikowa}({podstawaWyj})')
+        print(f'Liczba {inputNumber}({inputBase}) = {outputNumber}({outputBase})')
 
-        wybor = input('Chcesz przeliczyć jeszce raz (y/n): ')
-        if wybor == 'n':
+        choice = input('Chcesz przeliczyć jeszce raz (y/n): ')
+        if choice == 'n':
             print("Koniec.")
             break
         else:
@@ -118,5 +124,34 @@ def main():
             continue
 
 
+def tests():
+    print('TESTY')
+    # test 1
+    assert other2dec("1010", 2) == 10
+    assert other2dec('1252', 8) == 682
+    assert other2dec('2aa', 16) == 682
+    assert other2dec('20212202', 3) == 5015
+    # test 2
+    assert dec2other(682, 10) == '682'
+    assert dec2other(682, 8) == '1252'
+    assert dec2other(682, 16) == '2AA'
+    assert dec2other(682, 2) == '1010101010'
+    assert dec2other(10, 8) == '12'
+    assert dec2other(10, 10) == '10'
+    assert dec2other(10,16) == 'A'
+    assert dec2other(5015, 9) == '6782'
+    # test 3 dla zera
+    assert other2dec('0', 2) == 0
+    assert other2dec('0', 5) == 0
+    assert other2dec('0', 8) == 0
+    assert other2dec('0', 11) == 0
+    assert other2dec('0', 16) == 0
+    assert other2dec('0', 25) == 0
+
+    print('KONIEC TESTOW')
+    print("\n" * 1000)
+
+
 if __name__ == '__main__':
+    tests()
     main()
