@@ -3,11 +3,11 @@ LICZBA_DO_DODANIA_DO_RESZTY_ABY_OTRZYMAC_ZNAK_ASCII_DLA_RESZT_WIEKSZYCH_OD_9 = 5
 MIN_PODSTAWA_BEZ_ZNAKOW_ALFABETU = 10
 MIN_PODSTAWA = 2
 MAX_PODSTAWA = 36
-MAX_ZAKRES_LICZBY = 20
 #####################
 
+# testy dla 0 zeby dzialy
 
-# dziala aktualnie:
+# dziala aktualnie: CHYBA DZIALA
 # z wiekszej (do 10) na mniejszą
 # z wiekszej (od 10) na mniejsza
 def wczytajPodstaweWejsciowa():
@@ -28,7 +28,7 @@ def isCorrectForBase(liczba, podstawa):
 def wczytajLiczbeOPodstawie(podstawa):
     while True:
         if podstawa <= MIN_PODSTAWA_BEZ_ZNAKOW_ALFABETU:
-            liczba = int(input(f'Podaj liczbe w systemie ({podstawa}):'))
+            liczba = input(f'Podaj liczbe w systemie ({podstawa}):')
             return liczba
         elif podstawa > MIN_PODSTAWA_BEZ_ZNAKOW_ALFABETU:
             liczba = input(f'Podaj liczbe w systemie ({podstawa}):')
@@ -48,6 +48,7 @@ def wczytajPodstaweWynikowa(podstawaWej):
 
 #dziala przez podstaawe 10
 def zmienModulo(liczba, podstawaWyj):
+    liczba = int(liczba)
     reszty = []
     while liczba != 0:
         reszta = liczba % podstawaWyj
@@ -100,10 +101,12 @@ def main():
         liczba = wczytajLiczbeOPodstawie(podstawaWej)
         podstawaWyj = wczytajPodstaweWynikowa(podstawaWej)
 
-        if podstawaWej <= MIN_PODSTAWA_BEZ_ZNAKOW_ALFABETU:
-            liczbaWynikowa = zmienModulo(liczba, podstawaWyj)
-        elif podstawaWej > MIN_PODSTAWA_BEZ_ZNAKOW_ALFABETU:
-            liczbaWynikowa = konwertujNaWartosc(liczba, podstawaWej)
+        suma = konwertujNaWartosc(liczba, podstawaWej)
+        if suma == 0:
+            liczbaWynikowa = 0
+        else:
+            liczbaWynikowa = zmienModulo(suma, podstawaWyj)
+
         print(f'Liczba {liczba}({podstawaWej}) = {liczbaWynikowa}({podstawaWyj})')
 
         wybor = input('Chcesz przeliczyć jeszce raz (y/n): ')
